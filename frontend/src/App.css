@@ -1,0 +1,256 @@
+* {
+  margin: 0;
+}
+
+.login-container {
+  margin: 4vh 0 4vh 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-container {
+  margin: 4vh 0 4vh 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  padding: 5vh;
+  box-shadow: 2vh 2vh 4vh black;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  border-radius: 2vh;
+}
+
+.signup-form {
+  padding: 5vh;
+  box-shadow: 2vh 2vh 4vh black;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  border-radius: 2vh;
+}
+
+input,
+select {
+  height: 4vh;
+  box-shadow: 0.5vh 0.5vh 2vh black;
+  border: none;
+  border-radius: 2vh;
+  padding: 1vh;
+}
+
+textarea {
+  height: 10vh;
+  box-shadow: 0.5vh 0.5vh 2vh black;
+  border: none;
+  border-radius: 2vh;
+  padding: 1vh;
+}
+
+
+#Signup {
+  height: 4vh;
+  box-shadow: 2vh 2vh 4vh black;
+  border: none;
+  border-radius: 2vh;
+  padding: 1vh;
+  background-color: green;
+}
+
+input[value="Log In"] {
+  background-color: skyblue;
+  padding: 1vh 2vh;
+}
+
+input[value="Sign Up"],
+input[value="Search"] {
+  background-color: green;
+  padding: 1vh 2vh;
+}
+
+
+input[value="Search"], input[value="Submit"] {
+  background-color: blue;
+  font-weight: bold;
+  padding: 1vh 2vh;
+}
+
+.head {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-cont {
+  display: flex;
+  flex-direction: column;
+}
+
+.foot-container {
+  height: 40vh;
+  background: linear-gradient(to right, skyblue, blue);
+  height: 20vh;
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer {
+  display: flex;
+  justify-content: center;
+  margin: 4vh;
+  flex-direction: column;
+}
+
+.searchBar {
+  display: flex;
+  justify-content: center;
+  gap: 2vh;
+}
+
+.home h1 {
+  padding: 5vh;
+  flex-basis: 95%;
+}
+
+.head-container {
+  height: 40vh;
+  background: linear-gradient(to right, skyblue, blue);
+  height: 20vh;
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  gap: 4vh;
+  flex-basis: 10%;
+}
+
+.avatar-image {
+  width: 10vh;
+  border: none;
+  border-radius: 2vh;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+}
+
+.project-image {
+  width: 50vh;
+  border: none;
+  border-radius: 2vh;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+}
+
+.card {
+  display: flex;
+}
+
+.card h1 {
+  cursor: pointer;
+  text-shadow: 0.5vh 0.5vh 1vh black;
+}
+
+.projectCard {
+  display: flex;
+  gap: 4vh;
+  justify-content: center;
+  border: none;
+  margin: 4vh;
+  flex-direction: column;
+}
+
+.projectContainer {
+  display: flex;
+  gap: 4vh;
+  flex-direction: column;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  padding: 2vh;
+  border: none;
+  border-radius: 4vh;
+}
+
+#logout {
+  background-color: skyblue;
+  border: none;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  border-radius: 1vh;
+  padding: 1vh;
+  font-weight: bold;
+}
+
+#active {
+  background-color: yellowgreen;
+  border: none;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  border-radius: 1vh;
+  padding: 1vh;
+  font-weight: bold;
+}
+
+#logout:hover,
+#active:hover {
+  cursor: pointer;
+}
+
+.avatar {
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  font-weight: bold;
+}
+
+.post-form {
+  margin: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.project-desc {
+  display: flex;
+  flex-direction: column;
+}
+
+.noti-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2vh;
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  font-weight: bold;
+  margin: 4vh;
+}
+
+.noti-Bar {
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  background-color: brown;
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  text-align: center;
+}
+.noti-Bar:hover{
+  cursor: pointer;
+}
+.noti-Active {
+  box-shadow: 0.5vh 0.5vh 0.5vh black;
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  text-align: center;
+}
+.noti-Active:hover{
+  cursor: pointer;
+}
