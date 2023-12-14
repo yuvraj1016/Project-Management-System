@@ -18,12 +18,12 @@
     to run the frontend 
     <li>npm start</li>
   </ul>
-  this will run the application<a href="http://localhost:3000">Project Management System</a>
+  this will run <a href="http://localhost:3000">Project Management System</a>
 </p>
 
 <br>
 <h3>
-  For Frontend
+  For Backend
 </h3>
 <p>
   to run the backend first install the required dependencies by the command 
