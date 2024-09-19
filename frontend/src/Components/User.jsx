@@ -21,18 +21,25 @@ export default function User() {
   const [toggleDash, setToggleDash] = useState(false);
   const [tab, setTab] = useState(0);
 
+  // UseEffect to fetch user data
   useEffect(() => {
     const url = "http://localhost:3001/api/v1/user/user-details";
     axios
       .post(url, { id: userId })
       .then((res) => {
-        setUserData(res.data);
-        console.log(userdata);
+        setUserData(res.data.userDetails);  // State update happens here
+        console.log("User details fetched:", res.data.userDetails);  // Use the response directly here
       })
       .catch((err) => {
         console.log(err);
       });
   }, [userId]);
+
+  // Log userdata when it is updated
+  useEffect(() => {
+    console.log("Updated userdata:", userdata);  // This will trigger once userdata is updated
+  }, [userdata]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     const projectData = new FormData();
@@ -64,39 +71,30 @@ export default function User() {
       });
     //sendNotification();
   }
-  /* async function sendNotification() {
-        const body = {
-            Email: supervisorEmail,
-            from: userId,
-        }
-        const url = `http://localhost:3001/api/v1/notification/send-notification`;
-        await axios.post(url, body)
-            .then((res) => {
-                console.log(res);
-            }).catch((err) => {
-                console.log(err);
-            })
-    } */
+
   const handleFileChange = (e) => {
     const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     setFile(files[0]);
   };
+
   const selectFile = (e) => {
     const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     setSelectedImage(files[0]);
   };
+
   function handleLogout() {
     Cookies.remove("auth");
     Cookies.remove("UserId");
     navigate("/");
     window.location.reload();
   }
+
   return (
     <div className="home">
       <header className="head-container">
         <h1>Project Management System</h1>
         <div className="header-right">
-          {userdata.userDetails && (
+          {userdata && userdata.photo && (  // Ensure userdata is available before rendering
             <>
               <div
                 className="avatar"
@@ -108,10 +106,10 @@ export default function User() {
                 <img
                   className="avatar-image"
                   src={`data:${
-                    userdata.userDetails.photo.contentType
+                    userdata.photo.contentType
                   };base64,${btoa(
                     String.fromCharCode(
-                      ...new Uint8Array(userdata.userDetails.photo.data.data)
+                      ...new Uint8Array(userdata.photo.data.data)
                     )
                   )}`}
                   alt="..."
@@ -122,7 +120,7 @@ export default function User() {
                     color: "white",
                   }}
                 >
-                  {userdata.userDetails.first} {userdata.userDetails.last}
+                  {userdata.first} {userdata.last}
                 </p>
               </div>
             </>
@@ -171,7 +169,7 @@ export default function User() {
       </div>
 
       <div className="post-form">
-        {new Date(userdata?.userDetails?.submissionDate) > new Date() && (
+        {new Date(userdata?.submissionDate) > new Date() && (
           <>
             <button id="logout" onClick={() => setToggle(!toggle)}>
               Create
@@ -179,24 +177,22 @@ export default function User() {
             <br />
             <h3
               style={{
-                color: "green"
+                color: "green",
               }}
-            >   
+            >
               Deadline:
-              {new Date(
-                userdata.userDetails.submissionDate
-              ).toLocaleDateString()}
+              {new Date(userdata.submissionDate).toLocaleDateString()}
             </h3>
-            <h3 style={{color:"red"}}>please submit before deadline or portal will be closed</h3>
+            <h3 style={{ color: "red" }}>
+              please submit before deadline or portal will be closed
+            </h3>
           </>
         )}
         {toggle && (
           <>
             <div className="signup-container">
               <form className="signup-form" onSubmit={handleSubmit}>
-                {flag && (
-                  <p style={{ color: "red" }}>Change your Project name</p>
-                )}
+                {flag && <p style={{ color: "red" }}>Change your Project name</p>}
                 <label for="name">Project Name :</label>
                 <input
                   required="required"
@@ -206,7 +202,7 @@ export default function User() {
                   maxLength={30}
                   onChange={(e) => setProjectName(e.target.value)}
                 />
-                <label>Image Relevent to your project:</label>
+                <label>Image Relevant to your project:</label>
                 <input
                   required="required"
                   type="file"
@@ -250,10 +246,10 @@ export default function User() {
         )}
       </div>
       <div className="post-container">
-        {tab === 0 ? userdata.userDetails && <Projectcard /> : null}
-        {tab === 1 ? userdata.userDetails && <Search /> : null}
-        {tab === 2 ? userdata.userDetails && <Mypost Id={userId} /> : null}
-        {tab === 3 ? userdata.userDetails && <Notification /> : null}
+        {tab === 0 ? userdata && <Projectcard /> : null}
+        {tab === 1 ? userdata && <Search /> : null}
+        {tab === 2 ? userdata && <Mypost Id={userId} /> : null}
+        {tab === 3 ? userdata && <Notification /> : null}
       </div>
       <footer className="foot-container">
         <h1></h1>
