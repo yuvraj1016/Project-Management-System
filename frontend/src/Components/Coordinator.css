@@ -1,0 +1,157 @@
+.coordinator-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .coordinator-container h1 {
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .year-section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+  }
+  
+  .year-section h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+  
+  .deadline-section {
+    margin-bottom: 1rem;
+  }
+  
+  .deadline-info {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .deadline-form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .date-input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .submit-button, .assign-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-button:hover, .assign-button:hover {
+    background-color: #45a049;
+  }
+  
+  .student-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .student-table th, .student-table td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: left;
+  }
+  
+  .student-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .student-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .supervisor-form {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .supervisor-select {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .loading, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+  }
+  
+  .error {
+    color: #ff0000;
+  }
+  
+  @media (max-width: 768px) {
+    .coordinator-container {
+      padding: 1rem;
+    }
+  
+    .deadline-form {
+      flex-direction: column;
+    }
+  
+    .student-table, .student-table thead, .student-table tbody, .student-table th, .student-table td, .student-table tr {
+      display: block;
+    }
+  
+    .student-table thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+  
+    .student-table tr {
+      border: 1px solid #ccc;
+      margin-bottom: 0.5rem;
+    }
+  
+    .student-table td {
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+    }
+  
+    .student-table td:before {
+      content: attr(data-label);
+      position: absolute;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      font-weight: bold;
+    }
+  
+    .supervisor-form {
+      flex-direction: column;
+    }
+  }
+  
+  

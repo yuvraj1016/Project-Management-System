@@ -1,83 +1,91 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./Admin.css";
+
 export default function Admin() {
   const [profList, setProflist] = useState([]);
   const [year, setYear] = useState(3);
-  const [yearId,setYearId] = useState('');
+  const [yearId, setYearId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const url = "http://localhost:3001/api/v1/professor/get-all";
-    axios
-      .get(url)
-      .then((res) => {
+    const fetchProfessors = async () => {
+      try {
+        const url = "https://project-management-system-a4in.onrender.com/api/v1/professor/get-all";
+        const res = await axios.get(url);
         setProflist(res.data.prof);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch professors. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfessors();
   }, []);
-  async function handleSubmit(e){
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log({id:yearId,Year:year})
-    const url = "http://localhost:3001/api/v1/professor/update-coordinator";
-    axios.post(url,{id:yearId,Year:year})
-    .then((res)=>{
-        alert(`co-ordinator for ${year} has been selected now set for the other year`);
-    })
-    .catch(err=>console.log(err));
+    try {
+      const url = "https://project-management-system-a4in.onrender.com/api/v1/professor/update-coordinator";
+      await axios.post(url, { id: yearId, Year: year });
+      alert(`Coordinator for ${year}rd/th year has been selected. Please set for the other year.`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update coordinator. Please try again.");
+    }
   }
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
+
   return (
-    <div className="projectCard">
-      <h1>Select Co-ordinator </h1>
-      <div>
-        <label>
+    <div className="admin-container">
+      <h1>Select Coordinator</h1>
+      <div className="year-selection">
+        <label className="radio-label">
           <input
             type="radio"
-            value={year}
+            value={3}
             checked={year === 3}
             onChange={() => setYear(3)}
           />
-          Third Year
+          <span>Third Year</span>
         </label>
-        <label>
+        <label className="radio-label">
           <input
             type="radio"
-            value={year}
+            value={4}
             checked={year === 4}
             onChange={() => setYear(4)}
           />
-          Fourth Year
+          <span>Fourth Year</span>
         </label>
       </div>
-      {year === 3 && (
-        <form className="projectContainer" onSubmit={(e)=>handleSubmit(e)}>
-          <select value={yearId} required="required" onChange={(e)=>{setYearId(e.target.value)}}>
-            {profList.length > 0 &&
-              profList.map((item) => {
-                return (
-                  <option value={item._id}>
-                    {item.firstName} {item.lastName}
-                  </option>
-                );
-              })}
-          </select>
-          <input type="submit" value="Submit" />
-        </form>
-      )}
-      {year === 4 && (
-        <form className="projectContainer" onSubmit={(e)=>handleSubmit(e)}>
-          <select value={yearId} required="required" onChange={(e)=>{setYearId(e.target.value)}}>
-            {profList.length > 0 &&
-              profList.map((item) => {
-                return (
-                  <option value={item._id}>
-                    {item.firstName} {item.lastName}
-                  </option>
-                );
-              })}
-          </select>
-          <input type="submit" value="Submit" />
-        </form>
-      )}
+      <form className="coordinator-form" onSubmit={handleSubmit}>
+        <select 
+          value={yearId} 
+          required 
+          onChange={(e) => setYearId(e.target.value)}
+          className="professor-select"
+        >
+          <option value="">Select a professor</option>
+          {profList.map((item) => (
+            <option key={item._id} value={item._id}>
+              {item.firstName} {item.lastName}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="submit-button">Set as Coordinator</button>
+      </form>
     </div>
   );
 }
+

@@ -1,142 +1,156 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import "./Search.css";
 
 export default function Search() {
-    const [project, setProject] = useState([]);
+    const [projects, setProjects] = useState([]);
     const [type, setType] = useState('');
-    const [roll, setRoll] = useState(null);
-    const [name, setName] = useState('');
-    const [semester, setSemester] = useState(null);
-    const [year, setYear] = useState(null);
+    const [searchValue, setSearchValue] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (roll) {
-            let body = {
-                rollno: roll
-            }
-            const url = "http://localhost:3001/api/v1/post/search-roll";
-            axios.post(url, body)
-                .then((res) => {
-                    setProject(res.data.project);
-                    console.log(project);
-                }).catch((err) => {
-                    console.log(err);
-                })
+        setIsLoading(true);
+        setError(null);
+
+        let url = "";
+        let body = {};
+
+        switch (type) {
+            case "Roll":
+                url = "https://project-management-system-a4in.onrender.com/api/v1/post/search-roll";
+                body = { rollno: searchValue };
+                break;
+            case "Supervisor":
+                url = "https://project-management-system-a4in.onrender.com/api/v1/post/search-supervisor";
+                body = { supname: searchValue };
+                break;
+            case "Semester":
+                url = "https://project-management-system-a4in.onrender.com/api/v1/post/search-semester";
+                body = { sem: searchValue };
+                break;
+            case "Year":
+                url = "https://project-management-system-a4in.onrender.com/api/v1/post/search-year";
+                body = { Year: searchValue };
+                break;
+            default:
+                setError("Please select a search type");
+                setIsLoading(false);
+                return;
         }
-        if (name) {
-            let body = {
-                supname: name
-            }
-            const url = "http://localhost:3001/api/v1/post/search-supervisor";
-            axios.post(url, body)
-                .then((res) => {
-                    setProject(res.data.project);
-                    console.log(project);
-                }).catch((err) => {
-                    console.log(err);
-                })
+
+        try {
+            const res = await axios.post(url, body);
+            setProjects(res.data.project);
+        } catch (err) {
+            console.error(err);
+            setError("An error occurred while fetching the data. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        if (semester) {
-            let body = {
-                sem: semester
-            }
-            const url = "http://localhost:3001/api/v1/post/search-semester";
-            axios.post(url, body)
-                .then((res) => {
-                    setProject(res.data.project);
-                    console.log(project);
-                }).catch((err) => {
-                    console.log(err);
-                })
-        }
-        if (year) {
-            let body = {
-                Year: year
-            }
-            const url = "http://localhost:3001/api/v1/post/search-year";
-            axios.post(url, body)
-                .then((res) => {
-                    setProject(res.data.project);
-                    console.log(project);
-                }).catch((err) => {
-                    console.log(err);
-                })
-        }
-    }
-    async function updateView(id, view) {
+    };
+
+    const updateView = async (id, view) => {
         const params = {
             userid: id,
             viewed: view + 1,
         };
-        const url = `http://localhost:3001/api/v1/post/update-views`;
-        await axios.get(url, { params })
-            .then((res) => {
-                window.location.reload();
-            }).catch((err) => {
-                console.log(err);
-            })
-    }
+        const url = `https://project-management-system-a4in.onrender.com/api/v1/post/update-views`;
+        try {
+            await axios.get(url, { params });
+            setProjects(prevProjects =>
+                prevProjects.map(project =>
+                    project._id === id ? { ...project, viewed: view + 1 } : project
+                )
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
-        <div className="searchContainer">
-            <form className="searchBar" onSubmit={(e) => handleSubmit(e)}>
-                <select value={type} onChange={(e) => { setType(e.target.value) }} required="required">
-                    <option value="">Choose the type of search</option>
-                    <option value="Roll">Search By Roll</option>
-                    <option value="Supervisor">Search By SuperVisor Name</option>
-                    <option value="Semester">Search By Semester</option>
-                    <option value="Year">Search by Year</option>
-                </select>
-                {type ? (type === "Roll") && <input type="tel" pattern="[0-9]{8}" placeholder="Roll Number" value={roll} minLength={8} maxLength={8} onChange={(e) => setRoll(e.target.value)} required="required" /> : null}
-                {type ? (type === "Supervisor") && <input type="text" placeholder="Supervisor name" value={name} maxLength={25} onChange={(e) => setName(e.target.value)} required="required" /> : null}
-                {type ? (type === "Semester") && <input type="tel" pattern="[1-8]{1}" placeholder="Semester" value={semester} minLength={1} maxLength={1} onChange={(e) => setSemester(e.target.value)} required="required" /> : null}
-                {type ? (type === "Year") && <input type="tel" pattern="[1-4]{1}" placeholder="Year" value={year} minLength={1} maxLength={1} onChange={(e) => setYear(e.target.value)} required="required" /> : null}
-                <input type="Submit" value="Search" />
+        <div className="search-container">
+            <h2 className="search-title">Search Projects</h2>
+            <form className="search-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label htmlFor="search-type">Search Type:</label>
+                    <select 
+                        id="search-type"
+                        value={type} 
+                        onChange={(e) => {
+                            setType(e.target.value);
+                            setSearchValue('');
+                        }} 
+                        required
+                    >
+                        <option value="">Choose the type of search</option>
+                        <option value="Roll">Search By Roll</option>
+                        <option value="Supervisor">Search By Supervisor Name</option>
+                        <option value="Semester">Search By Semester</option>
+                        <option value="Year">Search by Year</option>
+                    </select>
+                </div>
+                {type && (
+                    <div className="form-group">
+                        <label htmlFor="search-value">Enter {type}:</label>
+                        <input
+                            id="search-value"
+                            type={type === "Roll" || type === "Semester" || type === "Year" ? "tel" : "text"}
+                            pattern={
+                                type === "Roll" ? "[0-9]{8}" :
+                                type === "Semester" ? "[1-8]{1}" :
+                                type === "Year" ? "[1-4]{1}" : undefined
+                            }
+                            placeholder={`Enter ${type}`}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            required
+                            minLength={type === "Roll" ? 8 : type === "Semester" || type === "Year" ? 1 : undefined}
+                            maxLength={type === "Roll" ? 8 : type === "Semester" || type === "Year" ? 1 : 25}
+                        />
+                    </div>
+                )}
+                <button type="submit" className="search-button" disabled={isLoading}>
+                    {isLoading ? "Searching..." : "Search"}
+                </button>
             </form>
-            <div className="projectCard">
-                {
-                    project.length > 0 && (
-                        project.map((item) => {
-                            return (
-                                <>
-                                    <div className="projectContainer" key={item._id} >
-                                        <div className="head">
-                                            <div className="card">
-                                                <h1 onClick={() => updateView(item._id, item.viewed)}>
-                                                    {item.projectName}
-                                                </h1>
-                                                <img
-                                                    className="project-image"
-                                                    src={`data:${item.projectImage.contentType};base64,${btoa(String.fromCharCode(...new Uint8Array(item.projectImage.data.data)))}`}
-                                                />
-                                            </div>
-                                            <div>
-                                                <p>
-                                                    Submitted by : {item.firstName} {item.lastName}
-                                                    <br />
-                                                    Roll : {item.rollNumber}
-                                                    <br />
-                                                    Year : {item.year}th
-                                                    <br />
-                                                    Semester : {item.semester}th
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="project-desc">
-                                            <h3>Description</h3>
-                                            <p>{item.projectDescription}</p>
-                                            <p style={{ fontWeight: "bold" }}>Views : {item.viewed}</p>
-                                            {item.grade && <p style={{ fontWeight: "bold" }}>Grade: {item.grade}</p>}
-                                            <p style={{ fontWeight: "bold" }}>Submitted To : {item.supervisorName}</p>
-                                            <p style={{ fontWeight: "bold" }}>Supervisor Email : <a href="mailto:example@example.com">{item.supervisorEmail}</a></p>
-                                        </div>
-                                    </div>
-                                </>
-                            )
-                        })
-                    )
-                }
+            {error && <p className="error-message">{error}</p>}
+            <div className="project-grid">
+                {projects.map((item) => (
+                    <div className="project-card" key={item._id}>
+                        <div className="project-header">
+                            <h3 onClick={() => updateView(item._id, item.viewed)}>
+                                {item.projectName}
+                            </h3>
+                            <img
+                                className="project-image"
+                                src={`data:${item.projectImage.contentType};base64,${btoa(String.fromCharCode(...new Uint8Array(item.projectImage.data.data)))}`}
+                                alt={item.projectName}
+                            />
+                        </div>
+                        <div className="project-body">
+                            <div className="project-info">
+                                <p><strong>Submitted by:</strong> {item.firstName} {item.lastName}</p>
+                                <p><strong>Roll:</strong> {item.rollNumber}</p>
+                                <p><strong>Year:</strong> {item.year}th</p>
+                                <p><strong>Semester:</strong> {item.semester}th</p>
+                            </div>
+                            <div className="project-description">
+                                <h4>Description</h4>
+                                <p>{item.projectDescription}</p>
+                            </div>
+                            <div className="project-meta">
+                                <p><strong>Views:</strong> {item.viewed}</p>
+                                {item.grade && <p><strong>Grade:</strong> {item.grade}</p>}
+                                <p><strong>Submitted To:</strong> {item.supervisorName}</p>
+                                <p><strong>Supervisor Email:</strong> <a href={`mailto:${item.supervisorEmail}`}>{item.supervisorEmail}</a></p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
-    )
+    );
 }
+

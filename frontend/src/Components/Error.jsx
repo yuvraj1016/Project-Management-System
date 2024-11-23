@@ -1,17 +1,15 @@
-export default function Error(){
-    return(
-        <div className="home">
-            <header className="head-container">
-                <h1>Project Management System</h1>
-            </header>
-            <div className="form-container">
-                <h1>
-                    404 Page not found
-                </h1>
-            </div>
-            <footer className="foot-container">
-                <h1>Author : Yuvraj Singh</h1>
-            </footer>
-        </div>
-    )
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+function Error() {
+  return (
+    <div className="error-container">
+      <h1>404 - Page Not Found</h1>
+      <p>Oops! The page you're looking for doesn't exist.</p>
+      <Link to="/" className="error-link">Go back to Home</Link>
+    </div>
+  );
 }
+
+export default Error;
+

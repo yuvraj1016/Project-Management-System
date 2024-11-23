@@ -1,66 +1,91 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-
+import "./Mypost.css";
 
 export default function Mypost({ Id }) {
-    const [project, setProject] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [visibleProjects, setVisibleProjects] = useState(3);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     useEffect(() => {
-        const url = "http://localhost:3001/api/v1/post/user-post";
-        axios.post(url, { id: Id })
-            .then((res) => {
-                setProject(res.data.project);
-                console.log(project);
-            }).catch((err) => {
-                console.log(err);
-            })
-    }, [])
+        const fetchProjects = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const url = "https://project-management-system-a4in.onrender.com/api/v1/post/user-post";
+                const res = await axios.post(url, { id: Id });
+                setProjects(res.data.project);
+            } catch (err) {
+                console.error(err);
+                setError("Failed to fetch projects. Please try again later.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProjects();
+    }, [Id]);
+
     async function updateView(id, view) {
         const params = {
             userid: id,
             viewed: view + 1,
-        }
-        const url = `http://localhost:3001/api/v1/post/update-views`;
-        await axios.get(url, { params })
-            .then((res) => {
-                window.location.reload();
-            }).catch((err) => {
-                console.log(err);
-            })
-    }
-    return (
-        <div className="projectCard">
-            {
-                project.length > 0 && (
-                    project.map((item) => {
-                        return (
-                            <>
-                                <div className="projectContainer" key={item._id} onClick={() => updateView(item._id, item.viewed)}>
-                                    <div className="head">
-                                        <div className="card">
-                                            <h1>
-                                                {item.projectName}
-                                            </h1>
-                                            <img
-                                                className="project-image"
-                                                src={`data:${item.projectImage.contentType};base64,${btoa(String.fromCharCode(...new Uint8Array(item.projectImage.data.data)))}`}
-                                            />
-                                        </div>
-                                        <div>
-                                            <h3>Description</h3>
-                                            <p>{item.projectDescription}</p>
-                                            <p style={{ fontWeight: "bold" }}>Views : {item.viewed}</p>
-                                            {item.grade && <p style={{ fontWeight: "bold" }}>Grade: {item.grade}</p>}
-                                            <p style={{ fontWeight: "bold" }}>Submitted To : {item.supervisorName}</p>
-                                            <p style={{ fontWeight: "bold" }}>Supervisor Email : <a href="mailto:example@example.com">{item.supervisorEmail}</a></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )
-                    })
+        };
+        const url = `https://project-management-system-a4in.onrender.com/api/v1/post/update-views`;
+        try {
+            await axios.get(url, { params });
+            setProjects(prevProjects =>
+                prevProjects.map(project =>
+                    project._id === id ? { ...project, viewed: view + 1 } : project
                 )
-            }
-            <button id="logout">Load More</button>
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return (
+        <div className="mypost-container">
+            <h2 className="mypost-title">My Projects</h2>
+            {isLoading && <p>Loading your projects...</p>}
+            {error && <p className="error-message">{error}</p>}
+            {!isLoading && !error && projects.length === 0 && <p>You haven't submitted any projects yet.</p>}
+            <div className="project-grid">
+                {projects.slice(0, visibleProjects).map((item) => (
+                    <div className="project-card" key={item._id}>
+                        <div className="project-image-container">
+                            <img
+                                className="project-image"
+                                src={`data:${item.projectImage.contentType};base64,${btoa(String.fromCharCode(...new Uint8Array(item.projectImage.data.data)))}`}
+                                alt={item.projectName}
+                            />
+                        </div>
+                        <div className="project-content">
+                            <h3 className="project-name">{item.projectName}</h3>
+                            <p className="project-description">{item.projectDescription}</p>
+                            <div className="project-meta">
+                                <span className="project-views">Views: {item.viewed}</span>
+                                {item.grade && <span className="project-grade">Grade: {item.grade}</span>}
+                            </div>
+                            <p className="project-supervisor">Submitted To: {item.supervisorName}</p>
+                            <a href={`mailto:${item.supervisorEmail}`} className="project-email">
+                                {item.supervisorEmail}
+                            </a>
+                            <button className="view-details-btn" onClick={() => updateView(item._id, item.viewed)}>
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            {visibleProjects < projects.length && (
+                <div className="load-more-container">
+                    <button className="load-more-btn" onClick={() => setVisibleProjects(prev => prev + 3)}>
+                        Load More
+                    </button>
+                </div>
+            )}
         </div>
-    )
+    );
 }
+

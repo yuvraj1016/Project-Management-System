@@ -1,163 +1,168 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import "./Signup.css";
 
 export default function Signup() {
     const navigate = useNavigate();
-    const [roll, setRoll] = useState(null);
-    const [password, setPassWord] = useState('');
-    const [email, setEmail] = useState('');
-    const [year, setYear] = useState(null);
-    const [section, setSection] = useState('');
-    const [semester,setSemester] = useState(null);
+    const [formData, setFormData] = useState({
+        roll: "",
+        password: "",
+        email: "",
+        year: "",
+        section: "",
+        semester: "",
+        first: "",
+        last: "",
+        userType: "student",
+        branch: "",
+        department: "",
+    });
     const [selectedImage, setSelectedImage] = useState(null);
-    const [first, setFirst] = useState('');
-    const [last, setLast] = useState('');
-    const [userType, setUserType] = useState("student");
-    const [branch, setBranch] = useState('');
-    const [department, setDepartMent] = useState('');
     const [flag, setFlag] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const selectFile = (e) => {
+        const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+        setSelectedImage(files[0]);
+    };
 
     async function handleSubmit(e) {
         e.preventDefault();
+        setIsLoading(true);
         const userData = new FormData();
+        Object.keys(formData).forEach(key => userData.append(key, formData[key]));
         userData.append("userImage", selectedImage);
-        userData.append("passWord", password);
-        userData.append("emailId", email);
-        userData.append("firstName", first);
-        userData.append("lastName", last);
-        if (userType === "student") {
-            userData.append("rollNumber", roll);
-            userData.append("Year", year);
-            userData.append("semester",semester)
-            userData.append("sec", section);
-            userData.append("branch", branch);
-            const url = "http://localhost:3001/" + "api/v1/user/user-signup";
-            console.log(url);
-            axios.post(url, userData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }).then((res) => {
-                if (!res.data.flag) {
-                    alert("You are being redirected to homepage now login using your credentials");
-                    navigate('/');
-                    window.location.reload();
-                } else {
-                    setFlag(res.data.flag);
-                }
-            }).catch((err) => {
-                console.log(err);
+
+        const url = `https://project-management-system-a4in.onrender.com/api/v1/${formData.userType}/${formData.userType}-signup`;
+
+        try {
+            const res = await axios.post(url, userData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-        } else {
-            userData.append("dept", department);
-            const url = "http://localhost:3001/" + "api/v1/professor/professor-signup";
-            console.log(url);
-            axios.post(url, userData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }).then((res) => {
-                if (!res.data.flag) {
-                    alert("You are being redirected to homepage now login using your credentials");
-                    navigate('/');
-                    window.location.reload();
-                } else {
-                    setFlag(res.data.flag);
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
+            if (!res.data.flag) {
+                alert("You are being redirected to homepage. Please login using your credentials.");
+                navigate('/');
+                window.location.reload();
+            } else {
+                setFlag(res.data.flag);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("An error occurred during signup. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     }
-    const selectFile = (e) => {
-        const files = e.dataTransfer
-            ? e.dataTransfer.files
-            : e.target.files;
-        setSelectedImage(files[0]);
-    }
-
 
     return (
-        <div className="home">
-            <header className="head-container">
-                <h1>Project Management System</h1>
-            </header>
-            <div className="signup-container">
-                <form className="signup-form" onSubmit={(e) => handleSubmit(e)}>
-                    {flag && <Link to="/" style={{ color: "red" }}>User Already exists click here to go to Login page and login</Link>}
-                    <div>
+        <div className="signup-page">
+            <main className="main-content">
+                <form className="signup-form" onSubmit={handleSubmit}>
+                    <h2>Sign Up</h2>
+                    {flag && <p className="error-message">User already exists. <Link to="/">Login here</Link></p>}
+                    <div className="form-group radio-group">
                         <label>
                             <input
                                 type="radio"
+                                name="userType"
                                 value="student"
-                                checked={userType === "student"}
-                                onChange={() => setUserType("student")}
+                                checked={formData.userType === "student"}
+                                onChange={handleChange}
                             />
-                            Student
+                            <span>Student</span>
                         </label>
                         <label>
                             <input
                                 type="radio"
+                                name="userType"
                                 value="professor"
-                                checked={userType === "professor"}
-                                onChange={() => setUserType("professor")}
+                                checked={formData.userType === "professor"}
+                                onChange={handleChange}
                             />
-                            Professor
+                            <span>Professor</span>
                         </label>
                     </div>
-                    <div>
-                        <label for="first" style={{ margin: "2vh" }}>First Name : </label>
-                        <input type="text" placeholder="First name" value={first} maxLength={10} onChange={(e) => setFirst(e.target.value)} required="required" />
-                        <label for="first" style={{ margin: "2vh" }}>Last Name : </label>
-                        <input type="text" placeholder="Last name" value={last} maxLength={10} onChange={(e) => setLast(e.target.value)} required="required" />
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label htmlFor="first">First Name</label>
+                            <input type="text" id="first" name="first" placeholder="First name" value={formData.first} maxLength={10} onChange={handleChange} required />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="last">Last Name</label>
+                            <input type="text" id="last" name="last" placeholder="Last name" value={formData.last} maxLength={10} onChange={handleChange} required />
+                        </div>
                     </div>
-                    <label for="StudentEmail" >College EmailId : </label>
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required="required" />
-                    {
-                        userType === 'student' ? (
-                            <>
-                                <label for="Phone">Roll Number : Example 21010123 </label>
-                                <input type="tel" pattern="[0-9]{8}" placeholder="Roll Number" value={roll} minLength={8} maxLength={8} onChange={(e) => setRoll(e.target.value)} required="required" />
-                                <label for="Phone">Year : </label>
-                                <input type="tel" pattern="[1-4]{1}" placeholder="Year" value={year} minLength={1} maxLength={1} onChange={(e) => setYear(e.target.value)} required="required" />
-                                <label for="sem">Semester : </label>
-                                <input type="tel" pattern="[1-8]{1}" placeholder="Semester" value={semester} minLength={1} maxLength={1} onChange={(e) => setSemester(e.target.value)} required="required" />
-                                <label for="section">Section : </label>
-                                <input type="text" placeholder="Section" value={section} minLength={1} maxLength={1} onChange={(e) => setSection(e.target.value)} required="required" />
-                                <label for="branch">Branch: </label>
-                                <select value={branch} onChange={(e) => setBranch(e.target.value)} required="required" >
+                    <div className="form-group">
+                        <label htmlFor="email">College Email ID</label>
+                        <input type="email" id="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+                    </div>
+                    {formData.userType === 'student' ? (
+                        <>
+                            <div className="form-group">
+                                <label htmlFor="roll">Roll Number</label>
+                                <input type="tel" id="roll" name="roll" pattern="[0-9]{8}" placeholder="Roll Number (e.g., 21010123)" value={formData.roll} minLength={8} maxLength={8} onChange={handleChange} required />
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="year">Year</label>
+                                    <input type="tel" id="year" name="year" pattern="[1-4]{1}" placeholder="Year" value={formData.year} minLength={1} maxLength={1} onChange={handleChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="semester">Semester</label>
+                                    <input type="tel" id="semester" name="semester" pattern="[1-8]{1}" placeholder="Semester" value={formData.semester} minLength={1} maxLength={1} onChange={handleChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="section">Section</label>
+                                    <input type="text" id="section" name="section" placeholder="Section" value={formData.section} minLength={1} maxLength={1} onChange={handleChange} required />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="branch">Branch</label>
+                                <select id="branch" name="branch" value={formData.branch} onChange={handleChange} required>
                                     <option value="">Select Branch</option>
                                     <option value="CSE">CSE</option>
                                     <option value="ECE">ECE</option>
                                     <option value="CSE_AI">CSE (AI)</option>
                                     <option value="ECE_VLSI">ECE (VLSI)</option>
                                 </select>
-                            </>
-                        ) : (
-                            <>
-                                <label for="branch">Department </label>
-                                <select value={department} onChange={(e) => setDepartMent(e.target.value)} required="required">
-                                    <option value="">Select Department</option>
-                                    <option value="CSE">CSE</option>
-                                    <option value="ECE">ECE</option>
-                                </select>
-                            </>
-                        )
-                    }
-                    <label for="Password">PassWord : </label>
-                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassWord(e.target.value)} required="required" />
-                    <label for="image" >Photo : </label>
-                    <input type="file" accept="image/*" onChange={(e) => selectFile(e)} required="required" />
-                    <input type="submit" value="Sign Up" />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="form-group">
+                            <label htmlFor="department">Department</label>
+                            <select id="department" name="department" value={formData.department} onChange={handleChange} required>
+                                <option value="">Select Department</option>
+                                <option value="CSE">CSE</option>
+                                <option value="ECE">ECE</option>
+                            </select>
+                        </div>
+                    )}
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="image">Photo</label>
+                        <input type="file" id="image" accept="image/*" onChange={selectFile} required />
+                    </div>
+                    <button type="submit" className="submit-btn" disabled={isLoading}>
+                        {isLoading ? "Signing Up..." : "Sign Up"}
+                    </button>
                 </form>
-            </div>
-            <footer className="foot-container">
-                <h1>Author : Yuvraj Singh</h1>
+            </main>
+            <footer className="footer">
+                <p>&copy; 2023 Project Management System. All rights reserved.</p>
             </footer>
         </div>
-    )
+    );
 }
-
-
 
